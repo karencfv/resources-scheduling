@@ -21,8 +21,20 @@ In order to understand the concept of "fully strict" multithreaded computation, 
 - **Dependency edges:** Decide which unit-time instructions should be executed first by connecting and ordering them.
 - **Continue edges:** In Figure 1 each shaded block is a thread with circles representing unit-time instructions, and the horizontal edges which are the continue edges represent the sequential ordering.
 - **Activation frame:** Chunk of memory allocated for a thread to be able to execute. The unit-time instructions of said thread can use up this memory space to store the values on which they compute.
+- **Thread spawning:** When a thread is executing and it creates or "spawns" another thread. Spawned threads are children of the thread that spawned them, and each thread can spawn as many children as it desires, but can only be done one instruction at a time. As Figure1 shows, i3 spawns T3(i4) and i6 spawns T4(i7). It is important to note that no processor can execute an instruction in a child thread until the spawning instruction has been executed (e.g. i4 cannot execute until i3 has completed).
+  
+  Unlike a subroutine call, a spawning thread can operate concurrently with the spawned thread.
 
 ![Figure 1](./assets/work-steal-figure1.png)
+**Figure 1:** A multithreaded computation.
+
+- **Spawn tree:** As shown on Figure1, when a **root** thread spawns children, and these in turn spawn other threads a spawn tree is created; as shown by the downward pointing arrows (**spawn edges**) that connect threads to their spawned children.
+
+- **Leaf threads:** These are spawned threads that have no children. In Figure1 these are represented by T3, T4, T5 and T6.
+
+- **Living thread:** What a thread is called once it has been spawned and its frame allocated. When the last instruction on the thread has been executed, it deallocates its frame and the thread **dies**.
+
+- **Join edges:** <!-- dotted arrows -->
 
 <!-- TODO: finish summary on this section -->
 
