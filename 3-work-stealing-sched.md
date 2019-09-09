@@ -34,7 +34,13 @@ In order to understand the concept of "fully strict" multithreaded computation, 
 
 - **Living thread:** What a thread is called once it has been spawned and its frame allocated. When the last instruction on the thread has been executed, it deallocates its frame and the thread **dies**.
 
-- **Join edges:** <!-- dotted arrows -->
+- **Join edges:** Represented on Figure1 by dotted arrows, join edges enforce ordering of instructions that consume data values produced by a separate instruction. A thread will stall if the instruction that produces the necessary data values hasn't been executed yet. Once said instruction executes, the join dependency is resolved and the consuming thread resumes it's execution (thread becomes ready).
+
+Multithreaded computations do **not** model how join dependencies get solved nor by which unresolved join dependencies get detected.
+
+Each instruction has at most a constant number of join edges occurring on it, this is consistent with the unit-time model of instructions.
+
+To prevent stalling after spawning. no join edges enter a parent thread immediately after it has spawned a child thread. A parent thread should be able to execute at least one more instruction.
 
 <!-- TODO: finish summary on this section -->
 
