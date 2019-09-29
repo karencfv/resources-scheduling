@@ -36,11 +36,23 @@ In order to understand the concept of "fully strict" multithreaded computation, 
 
 - **Join edges:** Represented on Figure1 by dotted arrows, join edges enforce ordering of instructions that consume data values produced by a separate instruction. A thread will stall if the instruction that produces the necessary data values hasn't been executed yet. Once said instruction executes, the join dependency is resolved and the consuming thread resumes it's execution (thread becomes ready).
 
-Multithreaded computations do **not** model how join dependencies get solved nor by which unresolved join dependencies get detected.
+    Multithreaded computations do **not** model how join dependencies get solved nor by which unresolved join dependencies get detected.
 
-Each instruction has at most a constant number of join edges occurring on it, this is consistent with the unit-time model of instructions.
+    Each instruction has at most a constant number of join edges occurring on it, this is consistent with the unit-time model of instructions.
 
-To prevent stalling after spawning. no join edges enter a parent thread immediately after it has spawned a child thread. A parent thread should be able to execute at least one more instruction.
+    To prevent stalling after spawning. no join edges enter a parent thread immediately after it has spawned a child thread. A parent thread should be able to execute at least one more instruction.
+
+- **DAG:** A directed acyclic graph is the order in which the instructions must be executed or execution schedule. This graph of instructions is defined by the constraints given by the spawn, continue and join edges of the computation. No processor can execute an instruction until after all the previous instructions in the graph have been executed. Because of this, the graph must be acyclic.
+
+It is assumed that a parent thread is alive until all of its children die, in other words, a thread will not deallocate its activation frame until all its children's frames have been deallocated. It is also assumed that the frames hold all the values in the computation. It is also assumed that no global storage is available for the computations outside of the frames. In conclusion, we are assuming that the total size of all the frames used by all living threads is the total space used by the computation at any given moment. This total space used in executing th computation is the maximum value of space over the course of the computation.
+
+A multithreaded computation is basically a **dag** of instructions connected by **dependency edges**. These instructions are connected by **continue edges** into threads, and these threads form a **spawn tree** with **spawn edges**. When a thread is spawned, an activation frame is allocated and this frame remains allocated as long as the thread remains alive. A living thread may be either ready or stalled due to an unresolved dependency.
+
+A multithreaded program can have many multithreaded computations. Here we will analyse only multithreaded computations.
+
+- **Strict multithreaded computation:** When all join edges from a thread go to an ancestor of the thread in an activation tree. This is to say that a thread cannot be invoked before all its arguments are available, although the arguments can be collected in parallel.
+
+- **Fully strict multithreaded computation:** When all join edges from a thread go to the thread's parent. This is a "well-structured" computation, in which all join edges from a subtree of the spawn tree, emanate from the root of the subtree. Figure 1 is an example of a fully strict multithreaded computation
 
 <!-- TODO: finish summary on this section -->
 
